@@ -1,0 +1,19 @@
+um sistema de gestao de Pedidos que contem workflow em mvc c#;
+estados da Pedidos
+    AguardandoPagamento,   // Pedido criado, aguardando confirmação do pagamento
+    PagamentoConfirmado,   // Pagamento aprovado (ainda não processado)
+    SeparandoEstoque,      // Em separação nos depósito
+    Transporte,            // Saiu para transporte/entregador
+    Entregue,              // Cliente já recebeu
+    Cancelado,             // Cancelado (antes ou depois do pagamento)
+    Devolvido              // Cliente devolveu o produto
+
+
+
+ter base de dados sqlexpress
+
+ter um ecram de configuracao de workflw e adicoes/gesta de estados
+
+ser muit simples e com excelente UI
+
+
