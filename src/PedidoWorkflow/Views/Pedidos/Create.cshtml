@@ -1,0 +1,50 @@
+@model PedidoCreateViewModel
+@{
+    ViewData["Title"] = "Novo Pedido";
+}
+
+<section class="panel-card form-panel">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Novo pedido</p>
+            <h1>Criar pedido</h1>
+        </div>
+    </div>
+
+    <form method="post" class="app-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-grid">
+            <div>
+                <label asp-for="Cliente" class="form-label"></label>
+                <input asp-for="Cliente" class="form-control" placeholder="Nome do cliente" />
+                <span asp-validation-for="Cliente" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="EmailCliente" class="form-label"></label>
+                <input asp-for="EmailCliente" class="form-control" placeholder="cliente@empresa.com" />
+                <span asp-validation-for="EmailCliente" class="text-danger"></span>
+            </div>
+            <div>
+                <label asp-for="ValorTotal" class="form-label"></label>
+                <input asp-for="ValorTotal" class="form-control" placeholder="0,00" />
+                <span asp-validation-for="ValorTotal" class="text-danger"></span>
+            </div>
+            <div class="full-span">
+                <label asp-for="Observacoes" class="form-label"></label>
+                <textarea asp-for="Observacoes" class="form-control" rows="5" placeholder="Observacoes operacionais"></textarea>
+                <span asp-validation-for="Observacoes" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="hero-actions">
+            <button type="submit" class="btn btn-dark">Guardar pedido</button>
+            <a class="btn btn-outline-dark" asp-action="Index">Cancelar</a>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

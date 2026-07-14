@@ -1,0 +1,56 @@
+@model PedidoListViewModel
+@{
+    ViewData["Title"] = "Pedidos";
+}
+
+<section class="panel-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Gestao de pedidos</p>
+            <h1>Lista de pedidos</h1>
+        </div>
+        <a class="btn btn-dark" asp-action="Create">Novo pedido</a>
+    </div>
+
+    <form method="get" class="toolbar-row">
+        <input class="form-control" type="search" name="busca" value="@Model.Busca" placeholder="Buscar por numero, cliente ou estado" />
+        <button class="btn btn-outline-dark" type="submit">Pesquisar</button>
+    </form>
+
+    @if (Model.Pedidos.Count == 0)
+    {
+        <p class="empty-state">Nenhum pedido encontrado para o filtro atual.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table app-table">
+                <thead>
+                    <tr>
+                        <th>Numero</th>
+                        <th>Cliente</th>
+                        <th>Email</th>
+                        <th>Estado</th>
+                        <th>Valor</th>
+                        <th>Atualizado</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var pedido in Model.Pedidos)
+                {
+                    <tr>
+                        <td>@pedido.Numero</td>
+                        <td>@pedido.Cliente</td>
+                        <td>@pedido.EmailCliente</td>
+                        <td><span class="state-pill">@pedido.EstadoAtualNome</span></td>
+                        <td>@pedido.ValorTotal.ToString("C")</td>
+                        <td>@pedido.AtualizadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        <td><a asp-action="Details" asp-route-id="@pedido.Id">Abrir</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

@@ -1,0 +1,24 @@
+@model ErrorViewModel
+@{
+    ViewData["Title"] = "Erro";
+}
+
+<section class="panel-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Falha da aplicacao</p>
+            <h1>Ocorreu um erro ao processar a operacao</h1>
+        </div>
+    </div>
+
+    <p class="muted-copy">
+        Verifique a configuracao da base SQL Express, os dados submetidos ou tente novamente.
+    </p>
+
+    @if (Model.ShowRequestId)
+    {
+        <p class="text-muted">Request ID: <code>@Model.RequestId</code></p>
+    }
+
+    <a class="btn btn-dark" asp-controller="Home" asp-action="Index">Voltar ao dashboard</a>
+</section>

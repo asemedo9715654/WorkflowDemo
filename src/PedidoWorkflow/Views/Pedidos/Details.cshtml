@@ -1,0 +1,88 @@
+@model PedidoDetailsViewModel
+@{
+    ViewData["Title"] = "Detalhes do Pedido";
+}
+
+<section class="hero-grid details-grid">
+    <div class="panel-card">
+        <p class="eyebrow">Pedido</p>
+        <h1>@Model.Pedido.Numero</h1>
+        <div class="details-stack">
+            <div><strong>Cliente:</strong> @Model.Pedido.Cliente</div>
+            <div><strong>Email:</strong> @Model.Pedido.EmailCliente</div>
+            <div><strong>Valor:</strong> @Model.Pedido.ValorTotal.ToString("C")</div>
+            <div><strong>Estado atual:</strong> <span class="state-pill">@Model.Pedido.EstadoAtualNome</span></div>
+            <div><strong>Criado em:</strong> @Model.Pedido.CriadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+            <div><strong>Ultima atualizacao:</strong> @Model.Pedido.AtualizadoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+        </div>
+
+        <div class="note-box">
+            <strong>Observacoes</strong>
+            <p>@(string.IsNullOrWhiteSpace(Model.Pedido.Observacoes) ? "Sem observacoes registadas." : Model.Pedido.Observacoes)</p>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <p class="eyebrow">Transicao</p>
+        <h2>Atualizar estado</h2>
+
+        @if (Model.ProximosEstados.Count == 0)
+        {
+            <p class="empty-state">Nao existem transicoes ativas a partir do estado atual.</p>
+        }
+        else
+        {
+            <form asp-action="UpdateStatus" method="post" class="app-form">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="PedidoId" value="@Model.Pedido.Id" />
+
+                <div>
+                    <label for="NovoEstadoId" class="form-label">Novo estado</label>
+                    <select id="NovoEstadoId" name="NovoEstadoId" class="form-select">
+                        <option value="">Selecione</option>
+                        @foreach (var estado in Model.ProximosEstados)
+                        {
+                            <option value="@estado.Id">@estado.Nome</option>
+                        }
+                    </select>
+                </div>
+
+                <div>
+                    <label for="Observacao" class="form-label">Observacao</label>
+                    <textarea id="Observacao" name="Observacao" class="form-control" rows="4" placeholder="Motivo ou detalhe da mudanca"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-dark">Atualizar status</button>
+            </form>
+        }
+    </div>
+</section>
+
+<section class="panel-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Historico</p>
+            <h2>Transicoes registadas</h2>
+        </div>
+    </div>
+
+    @if (Model.Historico.Count == 0)
+    {
+        <p class="empty-state">Este pedido ainda nao possui historico.</p>
+    }
+    else
+    {
+        <div class="timeline">
+            @foreach (var item in Model.Historico)
+            {
+                <article class="timeline-item">
+                    <div>
+                        <strong>@item.EstadoOrigem -> @item.EstadoDestino</strong>
+                        <p>@item.Observacao</p>
+                    </div>
+                    <time>@item.AlteradoEmUtc.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</time>
+                </article>
+            }
+        </div>
+    }
+</section>

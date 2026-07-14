@@ -1,0 +1,116 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="hero-grid">
+    <div class="hero-panel">
+        <p class="eyebrow">PRD implementado</p>
+        <h1>Sistema de gestao de pedidos com workflow configuravel</h1>
+        <p class="muted-copy">
+            Acompanhe pedidos, mantenha historico de transicoes e ajuste estados do fluxo sem alterar a logica principal da aplicacao.
+        </p>
+        <div class="hero-actions">
+            <a class="btn btn-dark" asp-controller="Pedidos" asp-action="Create">Criar pedido</a>
+            <a class="btn btn-outline-dark" asp-controller="Workflow" asp-action="Index">Configurar workflow</a>
+        </div>
+    </div>
+
+    <div class="hero-side">
+        <div class="metric-card">
+            <span>Total</span>
+            <strong>@Model.Stats.TotalPedidos</strong>
+            <small>pedidos registados</small>
+        </div>
+        <div class="metric-card">
+            <span>Ativos</span>
+            <strong>@Model.Stats.PedidosAtivos</strong>
+            <small>em progresso</small>
+        </div>
+        <div class="metric-card">
+            <span>Entregues</span>
+            <strong>@Model.Stats.PedidosEntregues</strong>
+            <small>finalizados</small>
+        </div>
+        <div class="metric-card">
+            <span>Cancelados</span>
+            <strong>@Model.Stats.PedidosCancelados</strong>
+            <small>encerrados no fluxo</small>
+        </div>
+    </div>
+</section>
+
+<section class="content-grid">
+    <div class="panel-card">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Pedidos recentes</p>
+                <h2>Ultima atividade</h2>
+            </div>
+            <a class="inline-link" asp-controller="Pedidos" asp-action="Index">Ver todos</a>
+        </div>
+
+        @if (Model.PedidosRecentes.Count == 0)
+        {
+            <p class="empty-state">Nenhum pedido foi criado ainda.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table app-table">
+                    <thead>
+                        <tr>
+                            <th>Numero</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                            <th>Valor</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var pedido in Model.PedidosRecentes)
+                    {
+                        <tr>
+                            <td>@pedido.Numero</td>
+                            <td>@pedido.Cliente</td>
+                            <td><span class="state-pill">@pedido.EstadoAtualNome</span></td>
+                            <td>@pedido.ValorTotal.ToString("C")</td>
+                            <td><a asp-controller="Pedidos" asp-action="Details" asp-route-id="@pedido.Id">Detalhes</a></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+
+    <div class="panel-card">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Estados ativos</p>
+                <h2>Workflow atual</h2>
+            </div>
+        </div>
+
+        <div class="state-list">
+            @foreach (var estado in Model.Estados)
+            {
+                <div class="state-card">
+                    <div>
+                        <strong>@estado.Nome</strong>
+                        <p>@estado.Descricao</p>
+                    </div>
+                    <div class="state-flags">
+                        @if (estado.Inicial)
+                        {
+                            <span class="badge text-bg-dark">Inicial</span>
+                        }
+                        <span class="badge @(estado.Ativo ? "text-bg-success" : "text-bg-secondary")">
+                            @(estado.Ativo ? "Ativo" : "Inativo")
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

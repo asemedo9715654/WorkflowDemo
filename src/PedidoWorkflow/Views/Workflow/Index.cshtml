@@ -1,0 +1,185 @@
+@model WorkflowViewModel
+@{
+    ViewData["Title"] = "Workflow";
+}
+
+<section class="content-grid workflow-grid">
+    <div class="panel-card">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Configuracao</p>
+                <h1>Novo estado</h1>
+            </div>
+        </div>
+
+        <form asp-action="AddState" method="post" class="app-form">
+            @Html.AntiForgeryToken()
+            <div class="form-grid">
+                <div>
+                    <label for="Nome" class="form-label">Nome</label>
+                    <input id="Nome" name="Nome" class="form-control" />
+                </div>
+                <div>
+                    <label for="Descricao" class="form-label">Descricao</label>
+                    <input id="Descricao" name="Descricao" class="form-control" />
+                </div>
+                <div class="checkbox-row">
+                    <input id="Ativo" name="Ativo" type="checkbox" checked />
+                    <label for="Ativo">Ativo</label>
+                </div>
+                <div class="checkbox-row">
+                    <input id="Inicial" name="Inicial" type="checkbox" />
+                    <label for="Inicial">Estado inicial</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-dark">Adicionar estado</button>
+        </form>
+
+        <hr />
+
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Regras do fluxo</p>
+                <h2>Nova transicao</h2>
+            </div>
+        </div>
+
+        <form asp-action="AddTransition" method="post" class="app-form">
+            @Html.AntiForgeryToken()
+            <div class="form-grid">
+                <div class="full-span">
+                    <label for="Label" class="form-label">Label</label>
+                    <input id="Label" name="Label" class="form-control" placeholder="Ex.: Confirmar pagamento" />
+                </div>
+                <div>
+                    <label for="EstadoOrigemId" class="form-label">Origem</label>
+                    <select id="EstadoOrigemId" name="EstadoOrigemId" class="form-select">
+                        <option value="">Selecione</option>
+                        @foreach (var estado in Model.Estados.Where(e => e.Ativo))
+                        {
+                            <option value="@estado.Id">@estado.Nome</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label for="EstadoDestinoId" class="form-label">Destino</label>
+                    <select id="EstadoDestinoId" name="EstadoDestinoId" class="form-select">
+                        <option value="">Selecione</option>
+                        @foreach (var estado in Model.Estados.Where(e => e.Ativo))
+                        {
+                            <option value="@estado.Id">@estado.Nome</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-dark">Adicionar transicao</button>
+        </form>
+    </div>
+
+    <div class="panel-card">
+        <div class="section-head">
+            <div>
+                <p class="eyebrow">Estados</p>
+                <h2>Gerir estados</h2>
+            </div>
+        </div>
+
+        <div class="accordion" id="workflowStates">
+            @for (var i = 0; i < Model.Estados.Count; i++)
+            {
+                var estado = Model.Estados[i];
+                var collapseId = $"collapse-{estado.Id}";
+                <div class="accordion-item workflow-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button @(i == 0 ? string.Empty : "collapsed")" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
+                            @estado.Nome
+                            <span class="status-inline">
+                                <span class="badge @(estado.Ativo ? "text-bg-success" : "text-bg-secondary")">@(estado.Ativo ? "Ativo" : "Inativo")</span>
+                                @if (estado.Inicial)
+                                {
+                                    <span class="badge text-bg-dark">Inicial</span>
+                                }
+                            </span>
+                        </button>
+                    </h2>
+                    <div id="@collapseId" class="accordion-collapse collapse @(i == 0 ? "show" : string.Empty)" data-bs-parent="#workflowStates">
+                        <div class="accordion-body">
+                            <form asp-action="UpdateState" method="post" class="app-form">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Id" value="@estado.Id" />
+                                <div class="form-grid">
+                                    <div>
+                                        <label class="form-label">Nome</label>
+                                        <input name="Nome" class="form-control" value="@estado.Nome" />
+                                    </div>
+                                    <div>
+                                        <label class="form-label">Descricao</label>
+                                        <input name="Descricao" class="form-control" value="@estado.Descricao" />
+                                    </div>
+                                    <div class="checkbox-row">
+                                        <input type="checkbox" name="Ativo" value="true" @(estado.Ativo ? "checked" : null) />
+                                        <input type="hidden" name="Ativo" value="false" />
+                                        <label>Ativo</label>
+                                    </div>
+                                    <div class="checkbox-row">
+                                        <input type="checkbox" name="Inicial" value="true" @(estado.Inicial ? "checked" : null) />
+                                        <input type="hidden" name="Inicial" value="false" />
+                                        <label>Inicial</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-dark">Guardar alteracoes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="panel-card">
+    <div class="section-head">
+        <div>
+            <p class="eyebrow">Transicoes</p>
+            <h2>Matriz atual do workflow</h2>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table app-table">
+            <thead>
+                <tr>
+                    <th>Label</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var transicao in Model.Transicoes)
+            {
+                <tr>
+                    <td>@transicao.Label</td>
+                    <td>@transicao.EstadoOrigemNome</td>
+                    <td>@transicao.EstadoDestinoNome</td>
+                    <td>
+                        <span class="badge @(transicao.Ativa ? "text-bg-success" : "text-bg-secondary")">
+                            @(transicao.Ativa ? "Ativa" : "Inativa")
+                        </span>
+                    </td>
+                    <td>
+                        <form asp-action="ToggleTransition" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@transicao.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-dark">
+                                @(transicao.Ativa ? "Desativar" : "Ativar")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>
